@@ -1,4 +1,5 @@
 import { when } from 'ramda';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import isValidInput from './isValidInput';
 import makeSearchRequestFromInput from './makeSearchRequestFromInput';
 
