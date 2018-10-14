@@ -1,14 +1,31 @@
-import { when } from 'ramda';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import isValidInput from './isValidInput';
-import makeSearchRequestFromInput from './makeSearchRequestFromInput';
+import { concat, ifElse, isEmpty, pathOr, pipe, trim } from 'ramda';
+import Results from './Results';
+import getInputValue from './getInputValue';
+import getWikipediaSearchUrlFor from './getWikipediaSearchUrlFor';
 
-const searchIfValidInput = when(isValidInput, makeSearchRequestFromInput);
+const render = markup => {
+  const resultsElement = document.getElementById('results');
 
-const init = () => {
-  const inputElement = document.querySelector('input');
-
-  inputElement.addEventListener('keyup', searchIfValidInput);
+  resultsElement.innerHTML = markup;
 };
 
-init();
+const makeSearchRequestIfValid = pipe(
+  getInputValue,
+  ifElse(
+    isEmpty,
+    () => {},
+    pipe(
+      getWikipediaSearchUrlFor,
+      url =>
+        fetch(url)
+          .then(res => res.json())
+          .then(Results)
+          .then(render)
+    )
+  )
+);
+
+const inputElement = document.querySelector('input');
+
+inputElement.addEventListener('keyup', makeSearchRequestIfValid);
